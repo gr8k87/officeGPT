@@ -150,14 +150,12 @@ export default function Sidebar({
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity ml-2">
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-6 w-6 p-0 hover:bg-red-500/20 hover:text-red-400"
+                            <div
+                              className="h-6 w-6 flex items-center justify-center rounded hover:bg-red-500/20 hover:text-red-400 cursor-pointer transition-colors"
                               onClick={(e) => e.stopPropagation()}
                             >
                               <Trash2 className="h-3 w-3" />
-                            </Button>
+                            </div>
                           </AlertDialogTrigger>
                           <AlertDialogContent className="bg-[hsl(var(--office-sidebar))] border-[hsl(var(--office-border))]">
                             <AlertDialogHeader>

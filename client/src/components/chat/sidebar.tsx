@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Trash2 } from "lucide-react";
 import type { Conversation } from "@shared/schema";
 
 interface SidebarProps {
@@ -61,8 +63,7 @@ export default function Sidebar({
     },
   });
 
-  const handleDeleteConversation = (e: React.MouseEvent, id: number) => {
-    e.stopPropagation();
+  const handleDeleteConversation = (id: number) => {
     deleteConversation.mutate(id);
     if (currentConversationId === id) {
       onNewChat();
@@ -146,15 +147,38 @@ export default function Sidebar({
                           {conversation.model} • {new Date(conversation.updatedAt).toLocaleDateString()}
                         </div>
                       </div>
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={(e) => handleDeleteConversation(e, conversation.id)}
-                          className="text-[hsl(var(--office-text-secondary))] hover:text-red-400 p-1 transition-colors"
-                        >
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity ml-2">
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 w-6 p-0 hover:bg-red-500/20 hover:text-red-400"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent className="bg-[hsl(var(--office-sidebar))] border-[hsl(var(--office-border))]">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle className="text-[hsl(var(--office-text))]">Delete conversation?</AlertDialogTitle>
+                              <AlertDialogDescription className="text-[hsl(var(--office-text-secondary))]">
+                                This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel className="bg-[hsl(var(--office-dark))] border-[hsl(var(--office-border))] text-[hsl(var(--office-text))] hover:bg-[hsl(var(--office-border))]">
+                                Cancel
+                              </AlertDialogCancel>
+                              <AlertDialogAction 
+                                className="bg-red-500 hover:bg-red-600 text-white"
+                                onClick={() => handleDeleteConversation(conversation.id)}
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </div>
                   </button>

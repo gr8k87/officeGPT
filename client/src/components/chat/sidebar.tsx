@@ -33,6 +33,11 @@ export default function Sidebar({
   // Query conversations
   const { data: conversations = [] } = useQuery<Conversation[]>({
     queryKey: ['/api/conversations', userId],
+    queryFn: async () => {
+      const response = await fetch(`/api/conversations/${userId}`);
+      if (!response.ok) throw new Error('Failed to fetch conversations');
+      return response.json();
+    },
   });
 
   // Delete conversation mutation

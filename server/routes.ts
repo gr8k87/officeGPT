@@ -2,15 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertConversationSchema, insertMessageSchema } from "@shared/schema";
-import OpenAI from "openai";
-
-// Initialize OpenAI and Gemini clients
-const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR || "default_key"
-});
-
-// For Gemini, we'll use fetch API since Google AI SDK might not be available
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_KEY || "default_key";
+import { aiService } from "./ai-service";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -73,104 +65,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Send message and get AI response
-  app.post("/api/chat", async (req, res) => {
+  // Business analysis endpoint (TaxBuddy-style pattern)
+  app.post("/api/analyze-query", async (req, res) => {
     try {
       const { conversationId, content, model } = req.body;
 
       if (!conversationId || !content || !model) {
-        return res.status(400).json({ message: "Missing required fields" });
+        return res.status(400).json({ message: "Missing required fields: conversationId, content, model" });
       }
+
+      const convId = parseInt(conversationId);
 
       // Save user message
       const userMessage = await storage.createMessage({
-        conversationId,
+        conversationId: convId,
         role: "user",
         content,
       });
 
       // Get conversation context
-      const conversation = await storage.getConversation(conversationId);
+      const conversation = await storage.getConversation(convId);
       if (!conversation) {
         return res.status(404).json({ message: "Conversation not found" });
       }
 
-      // Prepare messages for AI API
-      const apiMessages = conversation.messages.map(msg => ({
-        role: msg.role as "user" | "assistant",
-        content: msg.content,
+      // Prepare conversation history for AI analysis (last 10 messages for context)
+      const conversationHistory = conversation.messages.slice(-10).map(msg => ({
+        role: msg.role,
+        content: msg.content
       }));
 
-      let aiResponse: string;
-
-      try {
-        if (model.startsWith("gpt")) {
-          // OpenAI API call
-          const response = await openai.chat.completions.create({
-            model: model === "gpt-4" ? "gpt-4o" : model, // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-            messages: apiMessages,
-            max_tokens: 2000,
-            temperature: 0.7,
-          });
-
-          aiResponse = response.choices[0].message.content || "Sorry, I couldn't generate a response.";
-        } else if (model === "gemini-pro") {
-          // Gemini API call using fetch
-          const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              contents: apiMessages.map(msg => ({
-                role: msg.role === "assistant" ? "model" : "user",
-                parts: [{ text: msg.content }],
-              })),
-              generationConfig: {
-                temperature: 0.7,
-                maxOutputTokens: 2000,
-              },
-            }),
-          });
-
-          if (!geminiResponse.ok) {
-            throw new Error(`Gemini API error: ${geminiResponse.statusText}`);
-          }
-
-          const geminiData = await geminiResponse.json();
-          aiResponse = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response.";
-        } else {
-          throw new Error("Unsupported model");
-        }
-      } catch (apiError: any) {
-        console.error("AI API Error:", apiError);
-        return res.status(500).json({ 
-          message: `AI service error: ${apiError.message}. Please check your API keys and try again.` 
-        });
-      }
+      // Use AI service for structured business analysis
+      const analysisResult = await aiService.analyzeQuery({
+        query: content,
+        model,
+        conversationHistory,
+        context: "Professional business consultation"
+      });
 
       // Save AI response
       const assistantMessage = await storage.createMessage({
-        conversationId,
+        conversationId: convId,
         role: "assistant",
-        content: aiResponse,
-        model,
+        content: analysisResult.response,
       });
 
       // Update conversation title if it's the first exchange
       if (conversation.messages.length === 1) {
         const title = content.length > 50 ? content.substring(0, 50) + "..." : content;
-        await storage.updateConversationTitle(conversationId, title);
+        await storage.updateConversationTitle(convId, title);
       }
 
       res.json({
         userMessage,
         assistantMessage,
+        tokensUsed: analysisResult.tokensUsed
       });
 
     } catch (error: any) {
-      console.error("Chat error:", error);
-      res.status(500).json({ message: error.message });
+      console.error("Query analysis error:", error);
+      
+      if (error.message.includes("API key")) {
+        res.status(500).json({ message: "AI service configuration error. Please check API keys." });
+      } else if (error.message.includes("rate limit")) {
+        res.status(429).json({ message: "Service rate limit exceeded. Please try again in a moment." });
+      } else {
+        res.status(500).json({ message: error.message });
+      }
     }
   });
 

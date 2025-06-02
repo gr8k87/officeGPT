@@ -30,7 +30,7 @@ export const chatApi = {
 
   // Messages
   sendMessage: async (conversationId: number, content: string, model: string) => {
-    const response = await apiRequest("POST", "/api/chat", {
+    const response = await apiRequest("POST", "/api/analyze-query", {
       conversationId,
       content,
       model,

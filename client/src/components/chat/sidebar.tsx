@@ -140,18 +140,12 @@ export default function Sidebar({
                         : 'hover:bg-[hsl(var(--office-dark))] text-[hsl(var(--office-text-secondary))]'
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate">{conversation.title}</div>
-                        <div className="text-xs text-[hsl(var(--office-text-secondary))] truncate mt-0.5">
-                          {conversation.model} • {new Date(conversation.updatedAt).toLocaleDateString()}
-                        </div>
-                      </div>
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity ml-2">
+                    <div className="flex items-center">
+                      <div className="mr-2">
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <div
-                              className="h-6 w-6 flex items-center justify-center rounded hover:bg-red-500/20 hover:text-red-400 cursor-pointer transition-colors"
+                              className="h-5 w-5 flex items-center justify-center rounded hover:bg-red-500/20 hover:text-red-400 cursor-pointer transition-colors text-[hsl(var(--office-text-secondary))]"
                               onClick={(e) => e.stopPropagation()}
                             >
                               <Trash2 className="h-3 w-3" />
@@ -177,6 +171,12 @@ export default function Sidebar({
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium truncate">{conversation.title}</div>
+                        <div className="text-xs text-[hsl(var(--office-text-secondary))] truncate mt-0.5">
+                          {conversation.model} • {new Date(conversation.updatedAt).toLocaleDateString()}
+                        </div>
                       </div>
                     </div>
                   </button>

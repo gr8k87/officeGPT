@@ -28,37 +28,28 @@ export const aiService = {
     try {
       const { query, model, conversationHistory = [], context } = request;
       
-      // Format as structured business analysis request (like TaxBuddy pattern)
-      const structuredPrompt = `Technical Analysis Request:
-
-Query: "${query}"
-Context: ${context || "General business consultation"}
-Analysis Type: Professional consultation response
-Domain: Business/Technical
-
-Please provide a comprehensive, structured analysis addressing the query above. Format your response in a professional, business-appropriate manner.`;
-
       // Build messages array with conversation history
       const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
         {
           role: "system",
-          content: "You are a professional business and technical consultant providing structured analysis and expert guidance. Provide comprehensive, well-organized responses in a business-appropriate format."
+          content: "You are a helpful AI assistant. Provide direct, conversational responses that are clear and concise. Answer naturally like you would in a friendly chat conversation."
         }
       ];
 
       // Add conversation history if provided
       if (conversationHistory.length > 0) {
-        // Add previous context
-        messages.push({
-          role: "user",
-          content: "Previous Conversation Context:\n" + conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join("\n") + "\n\nCurrent Request:"
+        conversationHistory.forEach(msg => {
+          messages.push({
+            role: msg.role as "user" | "assistant",
+            content: msg.content
+          });
         });
       }
 
-      // Add current structured request
+      // Add current user query directly
       messages.push({
         role: "user",
-        content: structuredPrompt
+        content: query
       });
 
       if (model.toLowerCase().includes('gemini')) {
@@ -77,7 +68,7 @@ Please provide a comprehensive, structured analysis addressing the query above. 
           body: JSON.stringify({
             contents: [{
               role: "user",
-              parts: [{ text: structuredPrompt }],
+              parts: [{ text: query }],
             }],
             generationConfig: {
               temperature: 0.7,

@@ -1,5 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { ArrowDown } from "lucide-react";
 import WelcomeScreen from "./welcome-screen";
 import type { ConversationWithMessages } from "@shared/schema";
 
@@ -11,6 +13,7 @@ interface MessageAreaProps {
 
 export default function MessageArea({ conversation, isLoading, onSuggestedPrompt }: MessageAreaProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -19,13 +22,32 @@ export default function MessageArea({ conversation, isLoading, onSuggestedPrompt
     }
   }, [conversation?.messages]);
 
+  // Handle scroll to detect if user scrolled up
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10; // 10px threshold
+      setShowScrollButton(!isAtBottom);
+    }
+  };
+
+  // Scroll to bottom function
+  const scrollToBottom = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   if (!conversation || conversation.messages.length === 0) {
     return <WelcomeScreen onSuggestedPrompt={onSuggestedPrompt} />;
   }
 
   return (
     <div className="flex-1 overflow-hidden">
-      <ScrollArea className="h-full office-scrollbar" ref={scrollRef}>
+      <ScrollArea className="h-full office-scrollbar" ref={scrollRef} onScrollCapture={handleScroll}>
         <div className="max-w-4xl mx-auto px-6 py-6 space-y-6">
           {conversation.messages.map((message, index) => (
             <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} message-animation`}>
@@ -99,6 +121,16 @@ export default function MessageArea({ conversation, isLoading, onSuggestedPrompt
           ))}
         </div>
       </ScrollArea>
+      
+      {/* Floating scroll to bottom button */}
+      {showScrollButton && (
+        <Button
+          onClick={scrollToBottom}
+          className="fixed bottom-24 right-6 w-12 h-12 rounded-full bg-[hsl(var(--office-accent))] hover:bg-[hsl(var(--office-accent))]/90 text-white shadow-lg z-10 p-0"
+        >
+          <ArrowDown className="w-5 h-5" />
+        </Button>
+      )}
     </div>
   );
 }

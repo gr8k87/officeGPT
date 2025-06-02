@@ -23,7 +23,7 @@ export default function MessageInput({ conversationId, selectedModel, onConversa
 
   const sendMessage = useMutation({
     mutationFn: async ({ conversationId, content, model }: { conversationId: number; content: string; model: string }) => {
-      const response = await apiRequest("POST", "/api/chat", {
+      const response = await apiRequest("POST", "/api/analyze-query", {
         conversationId,
         content,
         model,

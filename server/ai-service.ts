@@ -32,7 +32,7 @@ export const aiService = {
       const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
         {
           role: "system",
-          content: "You are a helpful AI assistant. Provide direct, conversational responses that are clear and concise. Answer naturally like you would in a friendly chat conversation."
+          content: "You are a helpful AI assistant. Give direct, natural responses without formal business language, headers, or structured analysis. Keep your answers conversational and friendly, like you're chatting with someone. Don't use business document formatting."
         }
       ];
 

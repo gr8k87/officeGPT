@@ -81,7 +81,13 @@ export default function Chat() {
           conversation={conversation} 
           isLoading={isLoading}
           onSuggestedPrompt={(prompt) => {
-            // This will be handled by the message input component
+            const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
+            if (textarea) {
+              textarea.value = prompt;
+              const event = new Event('input', { bubbles: true });
+              textarea.dispatchEvent(event);
+              textarea.focus();
+            }
           }}
         />
 

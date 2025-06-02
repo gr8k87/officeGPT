@@ -5,6 +5,23 @@ interface WelcomeScreenProps {
 }
 
 export default function WelcomeScreen({ onSuggestedPrompt }: WelcomeScreenProps) {
+  // Get the message input element and trigger it with the suggested prompt
+  const handleSuggestedPrompt = (prompt: string) => {
+    // Find the textarea and set its value
+    const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
+    if (textarea) {
+      textarea.value = prompt;
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 128) + 'px';
+      
+      // Trigger change event
+      const event = new Event('input', { bubbles: true });
+      textarea.dispatchEvent(event);
+      
+      // Focus the textarea
+      textarea.focus();
+    }
+  };
   const suggestedPrompts = [
     {
       icon: (
@@ -65,7 +82,7 @@ export default function WelcomeScreen({ onSuggestedPrompt }: WelcomeScreenProps)
           {suggestedPrompts.map((prompt, index) => (
             <Button
               key={index}
-              onClick={() => onSuggestedPrompt(prompt.prompt)}
+              onClick={() => handleSuggestedPrompt(prompt.prompt)}
               variant="outline"
               className="p-4 h-auto bg-[hsl(var(--office-sidebar))] border-[hsl(var(--office-border))] hover:border-[hsl(var(--office-accent))] transition-colors text-left justify-start"
             >

@@ -17,6 +17,12 @@ export default function Chat() {
   // Query for current conversation
   const { data: conversation, isLoading } = useQuery<ConversationWithMessages>({
     queryKey: ['/api/conversations/detail', currentConversationId],
+    queryFn: async () => {
+      if (!currentConversationId) return null;
+      const response = await fetch(`/api/conversations/detail/${currentConversationId}`);
+      if (!response.ok) throw new Error('Failed to fetch conversation');
+      return response.json();
+    },
     enabled: !!currentConversationId,
   });
 

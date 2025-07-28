@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowDown } from "lucide-react";
 import WelcomeScreen from "./welcome-screen";
 import type { ConversationWithMessages } from "@shared/schema";
@@ -48,7 +47,11 @@ export default function MessageArea({ conversation, isLoading, onSuggestedPrompt
 
   return (
     <div className="flex-1 overflow-hidden">
-      <ScrollArea className="h-full office-scrollbar" ref={scrollRef} onScrollCapture={handleScroll}>
+      <div 
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="h-full overflow-y-auto office-scrollbar"
+      >
         <div className="max-w-4xl mx-auto px-6 py-6 space-y-6">
           {conversation.messages.map((message, index) => (
             <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} message-animation`}>
@@ -121,7 +124,7 @@ export default function MessageArea({ conversation, isLoading, onSuggestedPrompt
             </div>
           ))}
         </div>
-      </ScrollArea>
+      </div>
       
       {/* Floating scroll to bottom button */}
       {showScrollButton && (

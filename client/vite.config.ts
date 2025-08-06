@@ -13,7 +13,7 @@ export default defineConfig({
     proxy: {
       // This will let us call our backend API without CORS issues
       '/api': {
-        target: 'http://localhost:5001', // Assuming your backend runs on port 5001
+        target: 'http://localhost:8080', // Assuming your backend runs on port 5001
         changeOrigin: true,
       },
     },

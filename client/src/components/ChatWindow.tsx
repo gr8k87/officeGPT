@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import api from '@/api/axios';
 import { toast } from "@/components/hooks/use-toast";
 
 // Import components and types
@@ -15,15 +15,15 @@ import type { Conversation, Message } from '../../../shared/types';
 
 // API functions
 const fetchConversation = async (id: string): Promise<Conversation> => {
-    const { data } = await axios.get(`/api/conversations/detail/${id}`);
+    const { data } = await api.get(`/api/conversations/detail/${id}`);
     return data;
 };
 const postMessage = async (newMessage: { conversationId: number; message: string }): Promise<Message> => {
-    const { data } = await axios.post('/api/chat', newMessage);
+    const { data } = await api.post('/api/chat', newMessage);
     return data;
 };
 const updateTitle = async ({ id, title }: { id: number; title: string }) => {
-    await axios.put(`/api/conversations/${id}`, { title });
+    await api.put(`/api/conversations/${id}`, { title });
 };
 
 interface ChatWindowProps {

@@ -3,7 +3,7 @@
 import React from 'react'; // Added React import for safety
 import { Link, useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import api from '@/api/axios';
 
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -14,19 +14,19 @@ import type { Conversation } from '../../../shared/types';
 
 // API function to fetch conversations
 const fetchConversations = async (): Promise<Conversation[]> => {
-    const { data } = await axios.get('/api/conversations/user/1');
+    const { data } = await api.get('/api/conversations/user/1');
     return data;
 };
 
 // API function to create an empty conversation
 const createEmptyConversation = async (): Promise<{ id: number }> => {
-    const { data } = await axios.post('/api/conversations', { userId: 1 });
+    const { data } = await api.post('/api/conversations', { userId: 1 });
     return data;
 };
 
 // API function to delete a conversation
 const deleteConversation = async (id: number): Promise<void> => {
-    await axios.delete(`/api/conversations/${id}`);
+    await api.delete(`/api/conversations/${id}`);
 };
 
 const Sidebar = () => {

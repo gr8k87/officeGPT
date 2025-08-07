@@ -1,25 +1,19 @@
 # server/Dockerfile
 
-# 1. Use the official Node.js 20 LTS image
-FROM node:20-slim
-
-# 2. Set the working directory inside the container
+# --- Stage 1: Build the application ---
+FROM node:20 as builder
 WORKDIR /app
-
-# 3. Copy package.json and package-lock.json first for caching
 COPY package*.json ./
-
-# 4. Install production dependencies
-RUN npm install --omit=dev
-
-# 5. Copy the rest of the application code
+RUN npm install
 COPY . .
-
-# 6. Build the TypeScript code into JavaScript
 RUN npm run build
 
-# 7. Expose the port the app will run on
+# --- Stage 2: Create the final, small production image ---
+FROM node:20-slim
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --omit=dev
+COPY --from=builder /app/dist ./dist
+USER node
 EXPOSE 8080
-
-# 8. Define the command to start the app
-CMD [ "npm", "start" ]
+CMD [ "node", "dist/index.js" ]

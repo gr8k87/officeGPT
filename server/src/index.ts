@@ -22,7 +22,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 const corsOptions = {
-  origin: 'https://officegpt-c6072.firebaseapp.com',
+  origin: 'https://office-gpt-prod.web.app', // <-- This is the correct URL
   optionsSuccessStatus: 200
 };
 // This tells Express to first handle the OPTIONS request for all routes

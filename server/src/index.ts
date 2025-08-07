@@ -25,7 +25,12 @@ const corsOptions = {
   origin: 'https://officegpt-c6072.firebaseapp.com',
   optionsSuccessStatus: 200
 };
+// This tells Express to first handle the OPTIONS request for all routes
+app.options('*', cors(corsOptions)); 
+
+// Then, use the CORS policy for all other requests
 app.use(cors(corsOptions));
+
 app.use(express.json());
 
 // --- API ROUTES ---

@@ -1,6 +1,6 @@
 // server/src/db/users.ts
-import { db } from './index'; // We will create this index file next
-import { users } from './schema';
+import { db } from './index.js'; // We will create this index file next
+import { users } from './schema.js';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
 

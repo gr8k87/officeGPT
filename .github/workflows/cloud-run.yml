@@ -1,3 +1,5 @@
+# .github/workflows/cloud-run.yml
+
 name: Build and Deploy to Cloud Run
 
 on:
@@ -7,7 +9,7 @@ on:
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   GAR_LOCATION: us-central1 # Change this to your region if different
-  SERVICE: office-gpt-backend # The name of your Cloud Run service
+  SERVICE: office-gpt-backend
   REGION: us-central1 # Change this to your region if different
 
 jobs:
@@ -22,12 +24,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # --- THIS IS THE CORRECTED AUTHENTICATION STEP ---
       - name: Google Auth
         id: auth
         uses: 'google-github-actions/auth@v2'
         with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          credentials_json: '${{ secrets.GCP_SA_KEY }}' # <-- TYPO IS FIXED
 
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2'

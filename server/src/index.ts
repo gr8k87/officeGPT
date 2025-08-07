@@ -21,7 +21,11 @@ const openai = new OpenAI({
 const app = express();
 const port = process.env.PORT || 8080;
 
-app.use(cors());
+const corsOptions = {
+  origin: 'https://officegpt-c6072.firebaseapp.com', // Your frontend's live URL
+  optionsSuccessStatus: 200 // For legacy browser support
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // --- API ROUTES ---

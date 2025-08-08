@@ -8,6 +8,14 @@
     ],
     "rewrites": [
       {
+        "source": "/api/**",
+        "run": {
+          "serviceId": "office-gpt-backend",
+          "region": "us-central1",
+          "serviceAccount": "firebase-proxy-invoker@office-gpt-prod.iam.gserviceaccount.com"
+        }
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

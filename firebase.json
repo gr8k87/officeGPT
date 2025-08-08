@@ -12,6 +12,10 @@
         "run": {
           "serviceId": "office-gpt-backend",
           "region": "us-central1",
+          // --- THIS IS THE FIX ---
+          // Use the service account that we know exists and has the right permissions.
+          "serviceAccount": "github-actions-deployer@office-gpt-prod.iam.gserviceaccount.com"
+        }
       },
       {
         "source": "**",

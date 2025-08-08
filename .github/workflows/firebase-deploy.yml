@@ -6,9 +6,6 @@ on:
   push:
     branches:
       - main # This workflow runs on pushes to the main branch
-    paths:
-      - 'client/**' # It ONLY runs if files inside the 'client' folder have changed
-      - '.github/workflows/firebase-deploy.yml' # Or if the workflow file itself changes
 
 jobs:
   build_and_deploy_frontend:
